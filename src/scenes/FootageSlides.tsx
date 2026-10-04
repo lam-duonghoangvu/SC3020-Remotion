@@ -53,9 +53,9 @@ export const IntroFootageSlide = () => <SceneFrame section="Project 1 / Introduc
     <Reveal at={10}><div style={{ color: C.muted, fontSize: 28, marginBottom: 46 }}>In this video, we will walk through:</div></Reveal>
     <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr auto 1fr', alignItems: 'stretch', gap: 18 }}>
       {[
-        { n: '01', title: 'Design', detail: 'Disk-based storage and the B+ tree index', color: C.blue, at: 60 },
-        { n: '02', title: 'Demonstration', detail: 'Tasks 1, 2 and 3 running on the NBA dataset', color: C.purple, at: 170 },
-        { n: '03', title: 'Analysis', detail: 'Query performance of the different retrieval strategies', color: C.amber, at: 300 },
+        { n: '01', title: 'Design', detail: 'Disk-based storage and the B+ tree index', color: C.blue, at: 75 },
+        { n: '02', title: 'Demonstration', detail: 'Tasks 1, 2 and 3 running on the NBA dataset', color: C.purple, at: 165 },
+        { n: '03', title: 'Analysis', detail: 'Query performance of the different retrieval strategies', color: C.amber, at: 250 },
       ].map((step, i) => <React.Fragment key={step.n}>
         <Reveal at={step.at}><Panel accent={step.color} style={{ height: '100%', boxSizing: 'border-box', padding: '34px 34px' }}>
           <div style={{ ...S.mono, color: step.color, fontSize: 26, fontWeight: 700 }}>{step.n}</div>
@@ -65,7 +65,7 @@ export const IntroFootageSlide = () => <SceneFrame section="Project 1 / Introduc
         {i < 2 && <Reveal at={step.at + 50} style={{ display: 'flex' }}><Arrow color={C.dim} /></Reveal>}
       </React.Fragment>)}
     </div>
-    <Reveal at={420}><div style={{ display: 'flex', gap: 14, marginTop: 56 }}>
+    <Reveal at={320}><div style={{ display: 'flex', gap: 14, marginTop: 56 }}>
       <Pill color={C.blue}>{d.records.valid.toLocaleString('en-US')} NBA GAME RECORDS</Pill>
       <Pill color={C.purple}>B+ TREE ON FG_PCT_home</Pill>
       <Pill color={C.amber}>STORE · QUERY · DELETE</Pill>

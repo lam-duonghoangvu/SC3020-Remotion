@@ -4,12 +4,12 @@ export const HEIGHT = 1080;
 export const EDIT_MARKER_SECONDS = 1;
 
 export const scenes = [
-  { id: 'ProjectTitle', title: 'Project Title', durationSeconds: 8, purpose: 'Introduce the project and its storage, index, and retrieval themes.' },
-  { id: 'Architecture', title: 'Architecture Overview', durationSeconds: 25, purpose: 'Trace records from the input file into separate data and index files.' },
+  { id: 'ProjectTitle', title: 'Project Title', durationSeconds: 12, purpose: 'Introduce the project and its storage, index, and retrieval themes.' },
+  { id: 'Architecture', title: 'Architecture Overview', durationSeconds: 32, purpose: 'Trace records from the input file into separate data and index files.' },
   { id: 'RecordLayout', title: 'Record Layout', durationSeconds: 20, purpose: 'Show the packed 26-byte record and the key and tombstone fields.' },
-  { id: 'DataBlocks', title: '4 KB Data Blocks', durationSeconds: 25, purpose: 'Explain block capacity, heap pages, and RecordId addressing.' },
-  { id: 'BPlusTree', title: 'B+ Tree Page Design', durationSeconds: 30, purpose: 'Show the page format, fanout, leaf links, and tree shape.' },
-  { id: 'DuplicateKeys', title: 'Duplicate-Key Handling', durationSeconds: 20, purpose: 'Explain unique composite ordering for repeated key values.' },
+  { id: 'DataBlocks', title: '4 KB Data Blocks', durationSeconds: 30, purpose: 'Explain block capacity, heap pages, and RecordId addressing.' },
+  { id: 'BPlusTree', title: 'B+ Tree Page Design', durationSeconds: 32, purpose: 'Show the page format, fanout, leaf links, and tree shape.' },
+  { id: 'DuplicateKeys', title: 'Duplicate-Key Handling', durationSeconds: 23, purpose: 'Explain unique composite ordering for repeated key values.' },
   { id: 'QueryTraversal', title: 'Range-Query Traversal', durationSeconds: 30, purpose: 'Trace the greater-than range scan and report its result set.' },
   { id: 'NaiveRetrieval', title: 'Naïve RID Retrieval', durationSeconds: 20, purpose: 'Show repeated block reads when each returned RID is fetched independently.' },
   { id: 'GroupedRetrieval', title: 'Grouped RID Retrieval', durationSeconds: 25, purpose: 'Compare grouping RIDs by block while holding tree results constant.' },
@@ -29,14 +29,31 @@ export type SceneId = (typeof scenes)[number]['id'];
 export type EditPoint = { after: SceneId; insert: string; slideSeconds?: number; marker: boolean };
 
 export const editPoints: readonly EditPoint[] = [
-  { after: 'ProjectTitle', insert: 'Human project introduction', slideSeconds: 20, marker: false },
-  { after: 'Architecture', insert: 'Explain project architecture / show source directory', slideSeconds: 20, marker: false },
-  { after: 'DataBlocks', insert: 'Run Task 1 in the terminal', slideSeconds: 15, marker: true },
-  { after: 'BPlusTree', insert: 'Run Task 2 in the terminal', slideSeconds: 10, marker: true },
+  { after: 'ProjectTitle', insert: 'Human project introduction', slideSeconds: 13, marker: false },
+  { after: 'Architecture', insert: 'Explain project architecture / show source directory', slideSeconds: 18, marker: false },
+  { after: 'DataBlocks', insert: 'Run Task 1 in the terminal', slideSeconds: 25, marker: true },
+  { after: 'BPlusTree', insert: 'Run Task 2 in the terminal', slideSeconds: 27, marker: true },
   { after: 'QueryTraversal', insert: 'Show range_greater_than(), collect_range(), leftmost_leaf_for_key()', slideSeconds: 25, marker: false },
   { after: 'GroupedRetrieval', insert: 'Show QueryEngine naïve vs grouped implementation', marker: true },
   { after: 'AfterDeletion', insert: 'Run real Task 3 deletion and show updated tree output', marker: true },
 ];
+
+// Voice-over clips in public/voice, keyed by scene id or RealFootageNN slide id.
+// Segments carrying a clip are sized to the clip length rounded up, plus 1 second.
+export const voiceovers: Partial<Record<string, string>> = {
+  ProjectTitle: 'voice/1 - Project Title.m4a',
+  RealFootage01: 'voice/2 - REAL FOOTAGE 01 - Human Intro.m4a',
+  Architecture: 'voice/3 - Architecture Overview.m4a',
+  RealFootage02: 'voice/4 - REAL FOOTAGE 02.m4a',
+  RecordLayout: 'voice/5 - Record Layout.m4a',
+  DataBlocks: 'voice/6 - 4 KB Data Blocks.m4a',
+  RealFootage03: 'voice/7 - REAL FOOTAGE 03.m4a',
+  BPlusTree: 'voice/8 - B+ Tree Page Design.m4a',
+  RealFootage04: 'voice/9 - REAL FOOTAGE 04.m4a',
+  DuplicateKeys: 'voice/10 - Duplicate-Key Handling.m4a',
+};
+
+export const footageSlideId = (number: number) => `RealFootage${String(number).padStart(2, '0')}`;
 
 export const editPointSeconds = (point: EditPoint) => (point.slideSeconds ?? 0) + (point.marker ? EDIT_MARKER_SECONDS : 0);
 

@@ -1,6 +1,6 @@
 timestamp | scene before | recommended inserted footage | scene after
 --- | --- | --- | ---
-02:13 | Real Footage 03 slide | Run Task 1 in the terminal | B+ Tree Page Design
-02:54 | Real Footage 04 slide | Run Task 2 in the terminal | Duplicate-Key Handling
-04:55 | Grouped RID Retrieval | Show QueryEngine naïve vs grouped implementation | Why Grouping Is Not Enough
-07:41 | B+ Tree After Deletion | Run real Task 3 deletion and show updated tree output | Technical Takeaway
+02:30 | Real Footage 03 slide | Run Task 1 in the terminal | B+ Tree Page Design
+03:30 | Real Footage 04 slide | Run Task 2 in the terminal | Duplicate-Key Handling
+05:34 | Grouped RID Retrieval | Show QueryEngine naïve vs grouped implementation | Why Grouping Is Not Enough
+08:20 | B+ Tree After Deletion | Run real Task 3 deletion and show updated tree output | Technical Takeaway
