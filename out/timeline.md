@@ -1,6 +1,6 @@
 # Master Video Timeline
 
-Total runtime: 09:10 (550 seconds). Markers are included in the master and each lasts 1 second.
+Total runtime: 09:21 (561 seconds). Markers are included in the master and each lasts 1 second.
 
 | Scene | Start | End | Duration | Purpose | Suggested real footage after it |
 | --- | ---: | ---: | ---: | --- | --- |
@@ -16,16 +16,16 @@ Total runtime: 09:10 (550 seconds). Markers are included in the master and each 
 | REAL FOOTAGE 04 (slide) | 03:03 | 03:30 | 00:27 | Footage slide rendered in the master | Run Task 2 in the terminal |
 | EDIT POINT 04 | 03:30 | 03:31 | 00:01 | Post-production insertion slate | Run Task 2 in the terminal |
 | Duplicate-Key Handling | 03:31 | 03:54 | 00:23 | Explain unique composite ordering for repeated key values. | — |
-| Range-Query Traversal | 03:54 | 04:24 | 00:30 | Trace the greater-than range scan and report its result set. | Real Footage 05 slide |
-| REAL FOOTAGE 05 (slide) | 04:24 | 04:49 | 00:25 | Footage slide rendered in the master | — |
-| Naïve RID Retrieval | 04:49 | 05:09 | 00:20 | Show repeated block reads when each returned RID is fetched independently. | — |
-| Grouped RID Retrieval | 05:09 | 05:34 | 00:25 | Compare grouping RIDs by block while holding tree results constant. | Real Footage 06 slide |
-| REAL FOOTAGE 06 (slide) | 05:34 | 05:59 | 00:25 | Footage slide rendered in the master | — |
-| Why Grouping Is Not Enough | 05:59 | 06:19 | 00:20 | Contrast heap block coverage with a full linear scan. | — |
-| Heap vs FG_PCT_home-Clustered Layout | 06:19 | 06:49 | 00:30 | Show how physical record organization affects range retrieval. | — |
-| Four-Way Benchmark | 06:49 | 07:24 | 00:35 | Compare runtime and application-level data-block read calls. | — |
-| Selectivity Experiment | 07:24 | 07:54 | 00:30 | Compare observed retrieval times across query selectivities. | — |
-| Deletion | 07:54 | 08:19 | 00:25 | Separate logical index deletion from storage tombstoning. | — |
-| B+ Tree After Deletion | 08:19 | 08:44 | 00:25 | Show the resulting tree shape and validation outcome. | Run real Task 3 deletion and show updated tree output |
-| EDIT POINT 07 | 08:44 | 08:45 | 00:01 | Post-production insertion slate | Run real Task 3 deletion and show updated tree output |
-| Technical Takeaway | 08:45 | 09:10 | 00:25 | Summarize index search, RID grouping, locality, and selectivity. | — |
+| Range-Query Traversal | 03:54 | 04:25 | 00:31 | Trace the greater-than range scan and report its result set. | Real Footage 05 slide |
+| REAL FOOTAGE 05 (slide) | 04:25 | 04:48 | 00:23 | Footage slide rendered in the master | — |
+| Naïve RID Retrieval | 04:48 | 05:13 | 00:25 | Show repeated block reads when each returned RID is fetched independently. | — |
+| Grouped RID Retrieval | 05:13 | 05:43 | 00:30 | Compare grouping RIDs by block while holding tree results constant. | Real Footage 06 slide |
+| REAL FOOTAGE 06 (slide) | 05:43 | 06:08 | 00:25 | Footage slide rendered in the master | — |
+| Why Grouping Is Not Enough | 06:08 | 06:30 | 00:22 | Contrast heap block coverage with a full linear scan. | — |
+| Heap vs FG_PCT_home-Clustered Layout | 06:30 | 07:00 | 00:30 | Show how physical record organization affects range retrieval. | — |
+| Four-Way Benchmark | 07:00 | 07:35 | 00:35 | Compare runtime and application-level data-block read calls. | — |
+| Selectivity Experiment | 07:35 | 08:05 | 00:30 | Compare observed retrieval times across query selectivities. | — |
+| Deletion | 08:05 | 08:30 | 00:25 | Separate logical index deletion from storage tombstoning. | — |
+| B+ Tree After Deletion | 08:30 | 08:55 | 00:25 | Show the resulting tree shape and validation outcome. | Run real Task 3 deletion and show updated tree output |
+| EDIT POINT 07 | 08:55 | 08:56 | 00:01 | Post-production insertion slate | Run real Task 3 deletion and show updated tree output |
+| Technical Takeaway | 08:56 | 09:21 | 00:25 | Summarize index search, RID grouping, locality, and selectivity. | — |

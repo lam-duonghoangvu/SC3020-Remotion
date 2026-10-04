@@ -2,4 +2,4 @@ timestamp | scene before | recommended inserted footage | scene after
 --- | --- | --- | ---
 02:30 | Real Footage 03 slide | Run Task 1 in the terminal | B+ Tree Page Design
 03:30 | Real Footage 04 slide | Run Task 2 in the terminal | Duplicate-Key Handling
-08:44 | B+ Tree After Deletion | Run real Task 3 deletion and show updated tree output | Technical Takeaway
+08:55 | B+ Tree After Deletion | Run real Task 3 deletion and show updated tree output | Technical Takeaway

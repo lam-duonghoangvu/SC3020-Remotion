@@ -10,10 +10,10 @@ export const scenes = [
   { id: 'DataBlocks', title: '4 KB Data Blocks', durationSeconds: 30, purpose: 'Explain block capacity, heap pages, and RecordId addressing.' },
   { id: 'BPlusTree', title: 'B+ Tree Page Design', durationSeconds: 32, purpose: 'Show the page format, fanout, leaf links, and tree shape.' },
   { id: 'DuplicateKeys', title: 'Duplicate-Key Handling', durationSeconds: 23, purpose: 'Explain unique composite ordering for repeated key values.' },
-  { id: 'QueryTraversal', title: 'Range-Query Traversal', durationSeconds: 30, purpose: 'Trace the greater-than range scan and report its result set.' },
-  { id: 'NaiveRetrieval', title: 'Naïve RID Retrieval', durationSeconds: 20, purpose: 'Show repeated block reads when each returned RID is fetched independently.' },
-  { id: 'GroupedRetrieval', title: 'Grouped RID Retrieval', durationSeconds: 25, purpose: 'Compare grouping RIDs by block while holding tree results constant.' },
-  { id: 'Locality', title: 'Why Grouping Is Not Enough', durationSeconds: 20, purpose: 'Contrast heap block coverage with a full linear scan.' },
+  { id: 'QueryTraversal', title: 'Range-Query Traversal', durationSeconds: 31, purpose: 'Trace the greater-than range scan and report its result set.' },
+  { id: 'NaiveRetrieval', title: 'Naïve RID Retrieval', durationSeconds: 25, purpose: 'Show repeated block reads when each returned RID is fetched independently.' },
+  { id: 'GroupedRetrieval', title: 'Grouped RID Retrieval', durationSeconds: 30, purpose: 'Compare grouping RIDs by block while holding tree results constant.' },
+  { id: 'Locality', title: 'Why Grouping Is Not Enough', durationSeconds: 22, purpose: 'Contrast heap block coverage with a full linear scan.' },
   { id: 'HeapVsClustered', title: 'Heap vs FG_PCT_home-Clustered Layout', durationSeconds: 30, purpose: 'Show how physical record organization affects range retrieval.' },
   { id: 'Benchmark', title: 'Four-Way Benchmark', durationSeconds: 35, purpose: 'Compare runtime and application-level data-block read calls.' },
   { id: 'Selectivity', title: 'Selectivity Experiment', durationSeconds: 30, purpose: 'Compare observed retrieval times across query selectivities.' },
@@ -33,7 +33,7 @@ export const editPoints: readonly EditPoint[] = [
   { after: 'Architecture', insert: 'Explain project architecture / show source directory', slideSeconds: 18, marker: false },
   { after: 'DataBlocks', insert: 'Run Task 1 in the terminal', slideSeconds: 25, marker: true },
   { after: 'BPlusTree', insert: 'Run Task 2 in the terminal', slideSeconds: 27, marker: true },
-  { after: 'QueryTraversal', insert: 'Show range_greater_than(), collect_range(), leftmost_leaf_for_key()', slideSeconds: 25, marker: false },
+  { after: 'QueryTraversal', insert: 'Show range_greater_than(), collect_range(), leftmost_leaf_for_key()', slideSeconds: 23, marker: false },
   { after: 'GroupedRetrieval', insert: 'Show QueryEngine naïve vs grouped implementation', slideSeconds: 25, marker: false },
   { after: 'AfterDeletion', insert: 'Run real Task 3 deletion and show updated tree output', marker: true },
 ];
@@ -51,6 +51,13 @@ export const voiceovers: Partial<Record<string, string>> = {
   BPlusTree: 'voice/8 - B+ Tree Page Design.m4a',
   RealFootage04: 'voice/9 - REAL FOOTAGE 04.m4a',
   DuplicateKeys: 'voice/10 - Duplicate-Key Handling.m4a',
+  QueryTraversal: 'voice/11 - Range-Query Traversal.m4a',
+  RealFootage05: 'voice/12 - REAL FOOTAGE 05.m4a',
+  NaiveRetrieval: 'voice/13 - Naive RID Retrieval.m4a',
+  GroupedRetrieval: 'voice/14 - Grouped RID Retrieval.m4a',
+  RealFootage06: 'voice/15 - REAL FOOTAGE 06.m4a',
+  Locality: 'voice/16 - Why Grouping Is Not Enough.m4a',
+  HeapVsClustered: 'voice/17 - Heap vs FG-clustered Layout.m4a',
 };
 
 export const footageSlideId = (number: number) => `RealFootage${String(number).padStart(2, '0')}`;
