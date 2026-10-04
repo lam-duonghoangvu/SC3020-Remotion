@@ -1,0 +1,675 @@
+1
+00:00:00,000 --> 00:00:03,383
+Our project implements two core parts of a database system:
+
+2
+00:00:03,383 --> 00:00:06,386
+disk-based storage and a disk-resident B+ tree index.
+
+3
+00:00:06,386 --> 00:00:08,504
+We use them to store, query,
+
+4
+00:00:08,504 --> 00:00:10,559
+and delete NBA game records.
+
+5
+00:00:12,000 --> 00:00:14,218
+Hi, we are Group 19.
+
+6
+00:00:14,218 --> 00:00:17,715
+In this video, we will first explain our storage and
+
+7
+00:00:17,715 --> 00:00:21,365
+B+ tree design, then demonstrate Tasks 1, 2, and 3,
+
+8
+00:00:21,365 --> 00:00:23,924
+and finally analyze the query performance.
+
+9
+00:00:25,000 --> 00:00:27,871
+The input starts from games.txt.
+
+10
+00:00:27,871 --> 00:00:32,951
+The parser converts each valid row into a fixed-size record.
+
+11
+00:00:32,951 --> 00:00:37,147
+StorageManager writes those records into 4-kilobyte data blocks.
+
+12
+00:00:37,147 --> 00:00:40,107
+Each stored record receives a RecordId,
+
+13
+00:00:40,107 --> 00:00:44,303
+containing a block ID and a slot ID.
+
+14
+00:00:44,303 --> 00:00:47,064
+The B+ tree is stored separately
+
+15
+00:00:47,064 --> 00:00:50,377
+and maps FG_PCT_home to these RecordIds.
+
+16
+00:00:50,377 --> 00:00:55,015
+The data file and index file are therefore independent.
+
+17
+00:00:57,000 --> 00:01:01,283
+In the code, the main modules are separated into storage,
+
+18
+00:01:01,283 --> 00:01:03,885
+index, query, and experiment components.
+
+19
+00:01:03,885 --> 00:01:07,687
+StorageManager does not know about the B+ tree.
+
+20
+00:01:07,687 --> 00:01:10,189
+The QueryEngine connects them by using
+
+21
+00:01:10,189 --> 00:01:13,191
+the RecordIds returned by the index.
+
+22
+00:01:15,000 --> 00:01:18,928
+Each record is packed into exactly 26 bytes.
+
+23
+00:01:18,928 --> 00:01:21,513
+We store the date and numeric
+
+24
+00:01:21,513 --> 00:01:24,614
+game statistics using fixed-size primitive types.
+
+25
+00:01:24,614 --> 00:01:27,715
+FG_PCT_home is the B+ tree key.
+
+26
+00:01:27,715 --> 00:01:30,713
+The final byte is is_deleted, which acts
+
+27
+00:01:30,713 --> 00:01:33,815
+as a tombstone for logical deletion.
+
+28
+00:01:35,000 --> 00:01:38,571
+Each data block is 4,096 bytes.
+
+29
+00:01:38,571 --> 00:01:42,714
+The first two bytes store the record count,
+
+30
+00:01:42,714 --> 00:01:46,286
+followed by fixed-size 26-byte record slots.
+
+31
+00:01:46,286 --> 00:01:51,762
+This gives 157 records per block, with 12 bytes unused.
+
+32
+00:01:51,762 --> 00:01:54,738
+After removing incomplete input rows, 26,552
+
+33
+00:01:54,738 --> 00:01:57,834
+records require 170 data blocks.
+
+34
+00:01:57,834 --> 00:02:00,810
+A record is addressed by its
+
+35
+00:02:00,810 --> 00:02:03,905
+block ID and slot ID.
+
+36
+00:02:05,000 --> 00:02:09,915
+Here is the record structure and the block implementation.
+
+37
+00:02:09,915 --> 00:02:12,840
+StorageManager appends records into the active
+
+38
+00:02:12,840 --> 00:02:16,351
+block and flushes it when needed.
+
+39
+00:02:16,351 --> 00:02:19,393
+Now we run Task 1.
+
+40
+00:02:19,393 --> 00:02:24,401
+The program reports a 26-byte record, 157 records per block,
+
+41
+00:02:24,401 --> 00:02:28,380
+26,552 stored records, and 170 data blocks.
+
+42
+00:02:31,000 --> 00:02:34,298
+The B+ tree is also disk-based.
+
+43
+00:02:34,298 --> 00:02:38,036
+Every node occupies one 4-kilobyte index page.
+
+44
+00:02:38,036 --> 00:02:41,334
+Each page has a 20-byte header.
+
+45
+00:02:41,334 --> 00:02:45,842
+A leaf entry stores a 4-byte key and a 6-byte
+
+46
+00:02:45,842 --> 00:02:49,580
+RecordId, so each entry uses 10 bytes.
+
+47
+00:02:49,580 --> 00:02:53,846
+This gives a maximum leaf capacity of 407 entries,
+
+48
+00:02:53,846 --> 00:02:56,704
+which defines our parameter n.
+
+49
+00:02:56,704 --> 00:03:01,761
+The final heap-built tree contains 97 nodes across two levels.
+
+50
+00:03:03,000 --> 00:03:06,973
+The tree is built using iterative insertion.
+
+51
+00:03:06,973 --> 00:03:11,763
+When a leaf overflows, it is split and the new
+
+52
+00:03:11,763 --> 00:03:15,268
+child is inserted into its parent.
+
+53
+00:03:15,268 --> 00:03:18,306
+The process can propagate upward.
+
+54
+00:03:18,306 --> 00:03:23,307
+Running Task 2 gives n equals 407, 97 active nodes,
+
+55
+00:03:23,307 --> 00:03:28,215
+two levels, and 95 separator keys in the root.
+
+56
+00:03:31,000 --> 00:03:33,454
+FG_PCT_home contains many duplicate values.
+
+57
+00:03:33,454 --> 00:03:37,040
+In fact, 848 records have the value 0.500.
+
+58
+00:03:37,040 --> 00:03:41,004
+So a key alone cannot uniquely identify a record.
+
+59
+00:03:41,004 --> 00:03:43,363
+We order leaf entries by the
+
+60
+00:03:43,363 --> 00:03:46,194
+composite pair of key and RecordId.
+
+61
+00:03:46,194 --> 00:03:50,064
+This lets multiple equal keys coexist while deletion can still
+
+62
+00:03:50,064 --> 00:03:52,140
+identify one exact record.
+
+63
+00:03:54,000 --> 00:03:56,747
+For Task 3, we search for records
+
+64
+00:03:56,747 --> 00:03:59,590
+with FG_PCT_home strictly greater than 0.5.
+
+65
+00:03:59,590 --> 00:04:01,958
+The tree first descends from the
+
+66
+00:04:01,958 --> 00:04:04,421
+root to a boundary leaf.
+
+67
+00:04:04,421 --> 00:04:07,718
+Because duplicate 0.5 values can span several leaves,
+
+68
+00:04:07,718 --> 00:04:11,318
+the implementation may walk left through previous pointers.
+
+69
+00:04:11,318 --> 00:04:13,687
+It then scans forward through the
+
+70
+00:04:13,687 --> 00:04:16,529
+linked leaves and collects matching RecordIds.
+
+71
+00:04:16,529 --> 00:04:20,413
+The query returns 6,054 records, or 22.8 percent of the
+
+72
+00:04:20,413 --> 00:04:23,634
+dataset, with mean FG_PCT_home equal to 0.536966.
+
+73
+00:04:25,000 --> 00:04:30,315
+These are the three important functions.
+
+74
+00:04:30,315 --> 00:04:37,190
+range_greater_than defines the range, leftmost_leaf_for_key handles duplicate boundary values,
+
+75
+00:04:37,190 --> 00:04:41,619
+and collect_range follows the leaf chain
+
+76
+00:04:41,619 --> 00:04:46,226
+to collect all matching entries.
+
+77
+00:04:48,000 --> 00:04:50,988
+The first retrieval strategy is naïve.
+
+78
+00:04:50,988 --> 00:04:54,055
+After the B+ tree returns matching RecordIds,
+
+79
+00:04:54,055 --> 00:04:56,644
+we fetch every record independently.
+
+80
+00:04:56,644 --> 00:05:00,509
+If several RecordIds belong to the same data block,
+
+81
+00:05:00,509 --> 00:05:03,496
+that block can be requested repeatedly.
+
+82
+00:05:03,496 --> 00:05:07,580
+For the official predicate, this produces 6,052 application-level data-block read
+
+83
+00:05:07,580 --> 00:05:11,364
+calls and a median runtime of 4.966 milliseconds.
+
+84
+00:05:13,000 --> 00:05:17,339
+The grouped strategy keeps exactly the same B+ tree result.
+
+85
+00:05:17,339 --> 00:05:21,678
+The only change is how the returned RecordIds are fetched.
+
+86
+00:05:21,678 --> 00:05:24,205
+We group them by block ID,
+
+87
+00:05:24,205 --> 00:05:28,073
+read each required block once, and then access all required
+
+88
+00:05:28,073 --> 00:05:30,148
+slots from that block.
+
+89
+00:05:30,148 --> 00:05:33,430
+Application-level data reads fall from 6,052 to 169,
+
+90
+00:05:33,430 --> 00:05:35,505
+a 97.21 percent reduction.
+
+91
+00:05:35,505 --> 00:05:38,788
+Median runtime improves from 4.966 to 0.902 milliseconds,
+
+92
+00:05:38,788 --> 00:05:41,240
+giving a 5.5 times speedup.
+
+93
+00:05:43,000 --> 00:05:46,215
+Both versions use the same B+ tree,
+
+94
+00:05:46,215 --> 00:05:51,016
+the same heap data layout, and return the same records.
+
+95
+00:05:51,016 --> 00:05:55,818
+The naïve version calls record retrieval once for every RID.
+
+96
+00:05:55,818 --> 00:06:00,097
+The grouped version first groups the RIDs by block and
+
+97
+00:06:00,097 --> 00:06:02,394
+then performs block-oriented retrieval.
+
+98
+00:06:02,394 --> 00:06:06,360
+So this experiment isolates only the retrieval strategy.
+
+99
+00:06:08,000 --> 00:06:11,914
+However, grouping alone does not make the heap-indexed query faster
+
+100
+00:06:11,914 --> 00:06:14,014
+than a linear scan.
+
+101
+00:06:14,014 --> 00:06:16,782
+The matching records are scattered across every
+
+102
+00:06:16,782 --> 00:06:19,645
+one of the 170 data blocks.
+
+103
+00:06:19,645 --> 00:06:23,559
+Grouped B+ retrieval therefore still touches all 170 blocks and
+
+104
+00:06:23,559 --> 00:06:25,945
+takes 0.902 milliseconds, while the sequential
+
+105
+00:06:25,945 --> 00:06:28,427
+linear scan takes 0.547 milliseconds.
+
+106
+00:06:30,000 --> 00:06:33,819
+We therefore ran an additional experiment on physical locality.
+
+107
+00:06:33,819 --> 00:06:36,620
+Instead of storing records in input order,
+
+108
+00:06:36,620 --> 00:06:38,894
+we stably sort them by FG_PCT_home
+
+109
+00:06:38,894 --> 00:06:41,258
+before writing the data file.
+
+110
+00:06:41,258 --> 00:06:43,895
+The B+ tree remains a separate secondary
+
+111
+00:06:43,895 --> 00:06:46,623
+index containing key and RecordId pairs.
+
+112
+00:06:46,623 --> 00:06:50,352
+For the same query, qualifying records now occupy only 40
+
+113
+00:06:50,352 --> 00:06:52,716
+data blocks instead of 170.
+
+114
+00:06:52,716 --> 00:06:56,244
+Median grouped retrieval falls from 0.902 to 0.432 milliseconds,
+
+115
+00:06:56,244 --> 00:06:58,245
+a 2.09 times speedup.
+
+116
+00:07:00,000 --> 00:07:04,439
+These four configurations separate the main costs.
+
+117
+00:07:04,439 --> 00:07:07,833
+Linear scan takes 0.547 milliseconds.
+
+118
+00:07:07,833 --> 00:07:11,096
+Naïve B+ retrieval takes 4.966 milliseconds
+
+119
+00:07:11,096 --> 00:07:14,490
+because of repeated data-block accesses.
+
+120
+00:07:14,490 --> 00:07:18,407
+Grouping reduces it to 0.902 milliseconds.
+
+121
+00:07:18,407 --> 00:07:23,890
+Finally, grouped retrieval over FG_PCT_home-clustered storage takes 0.432 milliseconds.
+
+122
+00:07:23,890 --> 00:07:27,153
+The corresponding application read counts are
+
+123
+00:07:27,153 --> 00:07:30,547
+170, 6,052, 169, and 39.
+
+124
+00:07:30,547 --> 00:07:34,986
+These are application-level reads, not physical-device reads.
+
+125
+00:07:35,000 --> 00:07:37,991
+The result also depends on query selectivity.
+
+126
+00:07:37,991 --> 00:07:41,598
+At high selectivity, many records match and the heap index
+
+127
+00:07:41,598 --> 00:07:45,645
+still touches most data blocks, so sequential scanning is efficient.
+
+128
+00:07:45,645 --> 00:07:48,988
+As selectivity decreases, indexed retrieval becomes more attractive.
+
+129
+00:07:48,988 --> 00:07:51,188
+At 4.91 percent selectivity, heap grouped
+
+130
+00:07:51,188 --> 00:07:53,827
+retrieval slightly beats the linear scan.
+
+131
+00:07:53,827 --> 00:07:56,818
+At 0.99 percent, it is clearly faster.
+
+132
+00:07:56,818 --> 00:08:00,513
+Clustering improves locality further and shifts this crossover earlier.
+
+133
+00:08:00,513 --> 00:08:02,713
+These crossover points are specific to
+
+134
+00:08:02,713 --> 00:08:05,000
+this dataset and benchmark environment.
+
+135
+00:08:05,000 --> 00:08:08,656
+After retrieval, Task 3 deletes all 6,054 matching records.
+
+136
+00:08:08,656 --> 00:08:10,832
+In the B+ tree, deletion uses
+
+137
+00:08:10,832 --> 00:08:13,443
+the exact key and RecordId pair.
+
+138
+00:08:13,443 --> 00:08:16,821
+An underfilled node first attempts redistribution from a sibling;
+
+139
+00:08:16,821 --> 00:08:20,825
+otherwise nodes are merged and the parent is repaired recursively.
+
+140
+00:08:20,825 --> 00:08:23,506
+In the data file, deletion is logical:
+
+141
+00:08:23,506 --> 00:08:26,117
+is_deleted changes from zero to one.
+
+142
+00:08:26,117 --> 00:08:29,773
+Records are not moved, so existing RecordIds remain stable.
+
+143
+00:08:30,000 --> 00:08:32,752
+After deleting all values strictly above 0.5,
+
+144
+00:08:32,752 --> 00:08:36,504
+the tree shrinks from 97 to 76 active nodes.
+
+145
+00:08:36,504 --> 00:08:39,971
+The number of leaves falls from 96 to 75,
+
+146
+00:08:39,971 --> 00:08:42,651
+while the height remains two levels.
+
+147
+00:08:42,651 --> 00:08:45,689
+The root now contains 74 separator keys.
+
+148
+00:08:45,689 --> 00:08:48,441
+The largest remaining key is exactly 0.500,
+
+149
+00:08:48,441 --> 00:08:50,674
+which is correct because the predicate
+
+150
+00:08:50,674 --> 00:08:52,997
+is strictly greater than 0.5.
+
+151
+00:08:52,997 --> 00:08:55,320
+Structural validation passes after deletion.
+
+152
+00:08:57,000 --> 00:08:59,579
+For Task 3, we use grouped
+
+153
+00:08:59,579 --> 00:09:02,675
+retrieval on the heap-organized data file.
+
+154
+00:09:02,675 --> 00:09:05,254
+Before deletion, the B-plus-tree query finds
+
+155
+00:09:05,254 --> 00:09:08,349
+6,054 records with FG_PCT_home above 0.5.
+
+156
+00:09:08,349 --> 00:09:12,580
+A linear scan returns the same count and average of
+
+157
+00:09:12,580 --> 00:09:14,849
+0.536966, confirming the result.
+
+158
+00:09:14,849 --> 00:09:17,945
+We then delete all matching records.
+
+159
+00:09:17,945 --> 00:09:22,278
+When both queries are repeated, each returns zero matches.
+
+160
+00:09:22,278 --> 00:09:26,694
+The final output confirms 76 active B-plus-tree nodes, two levels,
+
+161
+00:09:26,694 --> 00:09:28,964
+and successful structural validation.
+
+162
+00:09:30,000 --> 00:09:32,310
+The B+ tree narrows the search,
+
+163
+00:09:32,310 --> 00:09:35,241
+but it does not determine query performance.
+
+164
+00:09:35,241 --> 00:09:39,205
+Grouping RecordIds cuts redundant reads, while clustering improves data locality.
+
+165
+00:09:39,205 --> 00:09:42,136
+Selectivity determines how many records we fetch.
+
+166
+00:09:42,136 --> 00:09:45,135
+Grouping reduced read calls from 6,052 to 169,
+
+167
+00:09:45,135 --> 00:09:49,100
+and clustering reduced unique data blocks from 170 to 40.
+
+168
+00:09:49,100 --> 00:09:52,634
+Together, these results show that storage layout and retrieval strategy
+
+169
+00:09:52,634 --> 00:09:55,220
+matter as much as index traversal.

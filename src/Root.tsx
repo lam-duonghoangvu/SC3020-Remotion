@@ -1,8 +1,9 @@
 import React from 'react';
-import { Audio, Composition, Sequence, staticFile } from 'remotion';
+import { Audio, Composition, Sequence, staticFile, useCurrentFrame } from 'remotion';
 import { sceneComponents } from './scenes/Scenes';
 import { footageSlides } from './scenes/FootageSlides';
 import { EditMarker } from './components/Visuals';
+import { subtitleCues } from './data/subtitles';
 import { EDIT_MARKER_SECONDS, editPoints, footageSlideId, FPS, HEIGHT, masterDurationSeconds, scenes, voiceovers, WIDTH } from './data/timeline';
 
 // Renders a segment with its voice-over clip, if one is mapped to this id.
@@ -11,9 +12,18 @@ const Voiced = ({ id, component: Component }: { id: string; component: React.FC 
   return <>{voice && <Audio src={staticFile(voice)} />}<Component /></>;
 };
 
+const Subtitles: React.FC = () => {
+  const seconds = useCurrentFrame() / FPS;
+  const cue = subtitleCues.find((candidate) => seconds >= candidate.startSeconds && seconds < candidate.endSeconds);
+  if (!cue) return null;
+  return <div style={{ position: 'absolute', left: 0, right: 0, bottom: 34, zIndex: 100, display: 'flex', justifyContent: 'center', pointerEvents: 'none', padding: '0 110px', boxSizing: 'border-box' }}>
+    <div style={{ maxWidth: 1540, padding: '12px 25px 14px', borderRadius: 12, background: 'rgba(3, 7, 12, 0.88)', border: '1px solid rgba(255,255,255,.16)', boxShadow: '0 8px 28px rgba(0,0,0,.42)', color: '#fff', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', fontSize: 36, fontWeight: 620, lineHeight: 1.24, textAlign: 'center', textShadow: '0 2px 4px rgba(0,0,0,.9)' }}>{cue.text}</div>
+  </div>;
+};
+
 export const MasterVideo: React.FC = () => {
   let cursor = 0;
-  return <>
+  return <div style={{ width: WIDTH, height: HEIGHT, position: 'relative' }}>
     {scenes.map((scene) => {
       const Component = sceneComponents[scene.id];
       const start = cursor;
@@ -37,7 +47,8 @@ export const MasterVideo: React.FC = () => {
       }
       return <React.Fragment key={`${scene.id}-with-edit`}>{section}{slide}{marker}</React.Fragment>;
     })}
-  </>;
+    <Subtitles />
+  </div>;
 };
 
 export const RemotionRoot: React.FC = () => <>

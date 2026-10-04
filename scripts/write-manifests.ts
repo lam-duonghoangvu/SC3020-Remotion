@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
+import { subtitleCues } from '../src/data/subtitles';
 import { editPoints, EDIT_MARKER_SECONDS, masterDurationSeconds, scenes, type EditPoint } from '../src/data/timeline';
 
 const time = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
@@ -36,4 +37,14 @@ for (let index = 0; index < scenes.length; index += 1) {
 await mkdir('out', { recursive: true });
 await writeFile('out/timeline.md', `${timelineRows.join('\n')}\n`, 'utf8');
 await writeFile('out/edit-points.txt', `${editRows.join('\n')}\n`, 'utf8');
-console.log(`Wrote out/timeline.md and out/edit-points.txt for ${masterDurationSeconds}s master.`);
+const srtTime = (seconds: number) => {
+  const milliseconds = Math.round(seconds * 1000);
+  const hours = Math.floor(milliseconds / 3_600_000);
+  const minutes = Math.floor(milliseconds % 3_600_000 / 60_000);
+  const secs = Math.floor(milliseconds % 60_000 / 1000);
+  const millis = milliseconds % 1000;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(millis).padStart(3, '0')}`;
+};
+const srt = subtitleCues.map((cue, index) => `${index + 1}\n${srtTime(cue.startSeconds)} --> ${srtTime(cue.endSeconds)}\n${cue.text}`).join('\n\n');
+await writeFile('out/sc3020-remotion-master.srt', `${srt}\n`, 'utf8');
+console.log(`Wrote timeline, edit points, and ${subtitleCues.length} subtitle cues for ${masterDurationSeconds}s master.`);
