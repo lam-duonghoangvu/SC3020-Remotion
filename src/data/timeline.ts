@@ -34,7 +34,7 @@ export const editPoints: readonly EditPoint[] = [
   { after: 'DataBlocks', insert: 'Run Task 1 in the terminal', slideSeconds: 25, marker: true },
   { after: 'BPlusTree', insert: 'Run Task 2 in the terminal', slideSeconds: 27, marker: true },
   { after: 'QueryTraversal', insert: 'Show range_greater_than(), collect_range(), leftmost_leaf_for_key()', slideSeconds: 25, marker: false },
-  { after: 'GroupedRetrieval', insert: 'Show QueryEngine naïve vs grouped implementation', marker: true },
+  { after: 'GroupedRetrieval', insert: 'Show QueryEngine naïve vs grouped implementation', slideSeconds: 25, marker: false },
   { after: 'AfterDeletion', insert: 'Run real Task 3 deletion and show updated tree output', marker: true },
 ];
 

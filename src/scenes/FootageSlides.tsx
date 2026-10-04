@@ -286,6 +286,58 @@ export const RangeQueryFootageSlide = () => <SceneFrame section="Task 3 / Range 
   </div>
 </SceneFrame>;
 
+// ---------------------------------------------------------------- 06 · QueryEngine naïve vs grouped
+
+const FlowBox = ({ title, detail, color, at, mono = true }: { title: string; detail?: string; color: string; at: number; mono?: boolean }) => <Reveal at={at}><div style={{ ...S.panel, borderLeft: `4px solid ${color}`, padding: '16px 22px' }}>
+  <div style={{ ...(mono ? S.mono : {}), color, fontSize: 22, fontWeight: 700 }}>{title}</div>
+  {detail && <div style={{ color: C.muted, fontSize: 18, marginTop: 5 }}>{detail}</div>}
+</div></Reveal>;
+
+const Down = ({ at, color = C.dim, label }: { at: number; color?: string; label?: string }) => <Reveal at={at} distance={6} duration={12}><Arrow vertical color={color} label={label} /></Reveal>;
+
+const BlockReads = ({ blocks, color, at }: { blocks: number[]; color: string; at: number }) => <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+  {blocks.map((block, i) => <Reveal key={i} at={at + i * 8} distance={5} duration={10}><span style={{ ...S.mono, fontSize: 17, padding: '6px 10px', borderRadius: 6, color: blocks.indexOf(block) < i ? C.red : color, background: `${blocks.indexOf(block) < i ? C.red : color}18`, border: `1px solid ${blocks.indexOf(block) < i ? C.red : color}55` }}>read B{block}</span></Reveal>)}
+</div>;
+
+const Lane = ({ name, color, at, children, calls, ms }: { name: string; color: string; at: number; children: React.ReactNode; calls: number; ms: number }) => <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+  <Reveal at={at}><div style={{ ...S.label, color, fontSize: 18, textAlign: 'center' }}>{name}</div></Reveal>
+  {children}
+  <Reveal at={at + 150}><div style={{ ...S.panel, borderTop: `3px solid ${color}`, padding: '14px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+    <span style={{ color, fontSize: 34, fontWeight: 750 }}>{calls.toLocaleString('en-US')} <span style={{ fontSize: 18, color: C.muted, fontWeight: 500 }}>read calls</span></span>
+    <span style={{ ...S.mono, color: C.muted, fontSize: 20 }}>{ms.toFixed(3)} ms</span>
+  </div></Reveal>
+</div>;
+
+const SAMPLE_BLOCKS = d.task3.examples.rids.map((rid) => rid.block);
+
+export const QueryEngineFootageSlide = () => <SceneFrame section="Task 3 / QueryEngine" title="One query path, two retrieval strategies" accent={C.green}>
+  <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 4 }}>
+    <div style={{ display: 'flex', justifyContent: 'center' }}><div style={{ width: 900 }}>
+      <FlowBox title="tree_.range_greater_than(threshold)" detail={`Same B+ tree result for both strategies · ${d.task3.matches.toLocaleString('en-US')} (key, RecordId) entries`} color={C.amber} at={0} />
+    </div></div>
+    <Reveal at={40}><div style={{ ...S.mono, textAlign: 'center', color: C.text, fontSize: 21, margin: '6px 0' }}>if (strategy == RetrievalStrategy::Grouped) <span style={{ color: C.dim }}>…</span> else <span style={{ color: C.dim }}>…</span></div></Reveal>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, flex: 1 }}>
+      <Lane name="Naïve · else branch" color={C.grey} at={60} calls={d.benchmark.naiveReads} ms={d.benchmark.naiveMedianMs}>
+        <FlowBox title="for each entry:" detail="one call per RecordId, in index order" color={C.grey} at={75} />
+        <Down at={95} />
+        <FlowBox title="storage_.get_record(rid)" detail="reads the RID's data block every time" color={C.grey} at={105} />
+        <Down at={125} />
+        <Reveal at={130}><BlockReads blocks={SAMPLE_BLOCKS} color={C.grey} at={130} /></Reveal>
+      </Lane>
+      <Lane name="Grouped · if branch" color={C.green} at={260} calls={d.benchmark.groupedReads} ms={d.benchmark.groupedMedianMs}>
+        <FlowBox title="get_records_grouped_by_block(ids)" detail="collect every RecordId first" color={C.green} at={275} />
+        <Down at={295} />
+        <FlowBox title="std::map<block_id, slots>" detail="group the requested slots by data block" color={C.green} at={305} />
+        <Down at={325} />
+        <Reveal at={330}><BlockReads blocks={[...new Set(SAMPLE_BLOCKS)]} color={C.green} at={330} /></Reveal>
+      </Lane>
+    </div>
+    <Reveal at={520}><div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginTop: 14 }}>
+      <Pill color={C.amber}>SAME B+ TREE</Pill><Pill color={C.blue}>SAME HEAP LAYOUT</Pill><Pill color={C.purple}>SAME {d.task3.matches.toLocaleString('en-US')} RECORDS</Pill><Pill color={C.green}>ONLY RETRIEVAL CHANGES</Pill>
+    </div></Reveal>
+  </div>
+</SceneFrame>;
+
 // Keyed by edit point number (1-based), matching editPoints in data/timeline.ts.
 export const footageSlides: Record<number, React.FC> = {
   1: IntroFootageSlide,
@@ -293,4 +345,5 @@ export const footageSlides: Record<number, React.FC> = {
   3: Task1FootageSlide,
   4: Task2FootageSlide,
   5: RangeQueryFootageSlide,
+  6: QueryEngineFootageSlide,
 };
