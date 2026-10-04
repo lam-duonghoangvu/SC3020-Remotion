@@ -338,6 +338,76 @@ export const QueryEngineFootageSlide = () => <SceneFrame section="Task 3 / Query
   </div>
 </SceneFrame>;
 
+// ---------------------------------------------------------------- 07 · Task 3 execution
+
+const executionLines = [
+  { at: 20, color: C.muted, text: '$ ./sc3020_project1 --task 3' },
+  { at: 75, color: C.blue, text: '[config] layout=heap  retrieval=grouped' },
+  { at: 150, color: C.amber, text: '[b+ tree] predicate: FG_PCT_home > 0.5' },
+  { at: 230, color: C.amber, text: '[b+ tree] matches=6,054  mean=0.536966' },
+  { at: 335, color: C.grey, text: '[linear]  matches=6,054  mean=0.536966' },
+  { at: 420, color: C.green, text: '[verify]  count=MATCH  average=MATCH' },
+  { at: 510, color: C.red, text: '[delete]  removed 6,054 matching records' },
+  { at: 625, color: C.green, text: '[b+ tree] matches=0    [linear] matches=0' },
+  { at: 770, color: C.purple, text: '[tree] active_nodes=76  levels=2' },
+  { at: 835, color: C.green, text: '[validate] PASS' },
+] as const;
+
+const ExecutionStep = ({ label, detail, color, at, active }: { label: string; detail: string; color: string; at: number; active: boolean }) => <Reveal at={at} distance={8} duration={14}>
+  <div style={{ border: `1px solid ${active ? color : C.line}`, background: active ? `${color}18` : C.panel2, borderRadius: 10, padding: '13px 15px', boxShadow: active ? `0 0 22px ${color}20` : undefined }}>
+    <div style={{ color: active ? color : C.muted, fontSize: 17, fontWeight: 750, letterSpacing: .5 }}>{label}</div>
+    <div style={{ color: active ? C.text : C.dim, fontSize: 15, marginTop: 4 }}>{detail}</div>
+  </div>
+</Reveal>;
+
+export const Task3ExecutionFootageSlide = () => {
+  const frame = useCurrentFrame();
+  const deleteProgress = interpolate(frame, [500, 590], [0, 100], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const steps = [
+    { label: 'CONFIGURE', detail: 'grouped · heap', color: C.blue, at: 35, until: 145 },
+    { label: 'QUERY', detail: 'B+ tree range', color: C.amber, at: 145, until: 325 },
+    { label: 'VERIFY', detail: 'linear scan', color: C.grey, at: 325, until: 495 },
+    { label: 'DELETE', detail: '6,054 records', color: C.red, at: 495, until: 615 },
+    { label: 'RECHECK', detail: 'zero matches', color: C.green, at: 615, until: 755 },
+    { label: 'VALIDATE', detail: 'tree passes', color: C.purple, at: 755, until: 990 },
+  ] as const;
+
+  return <SceneFrame section="Task 3 / Animated Execution" title="Query, verify, delete, and validate" accent={C.green}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 22 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }}>
+        {steps.map((step) => <ExecutionStep key={step.label} {...step} active={frame >= step.at && frame < step.until} />)}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1.35fr .65fr', gap: 24, flex: 1, minHeight: 0 }}>
+        <Panel accent={C.green} title="TASK 3 · PROGRAM OUTPUT" style={{ padding: '22px 26px', overflow: 'hidden' }}>
+          <div style={{ ...S.mono, background: '#080d13', border: `1px solid ${C.line}`, borderRadius: 12, height: 'calc(100% - 4px)', boxSizing: 'border-box', padding: '18px 22px', fontSize: 20, lineHeight: 1.7 }}>
+            {executionLines.map((line) => <Reveal key={line.text} at={line.at} distance={5} duration={12}>
+              <div style={{ color: line.color, whiteSpace: 'pre' }}>{line.text}</div>
+            </Reveal>)}
+            <Reveal at={500} distance={0} duration={10}>
+              <div style={{ height: 6, background: C.redSoft, borderRadius: 99, overflow: 'hidden', marginTop: 7 }}>
+                <div style={{ height: '100%', width: `${deleteProgress}%`, background: C.red, borderRadius: 99 }} />
+              </div>
+            </Reveal>
+          </div>
+        </Panel>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Reveal at={210}><MetricCard label="Before deletion" value={d.task3.matches.toLocaleString('en-US')} note={`mean · ${d.task3.meanFgPct.toFixed(6)}`} accent={C.amber} /></Reveal>
+          <Reveal at={620}><MetricCard label="After deletion" value="0 matches" note="B+ tree = linear scan" accent={C.green} /></Reveal>
+          <Reveal at={760}><Panel accent={C.purple} title="UPDATED B+ TREE" style={{ padding: '20px 24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div><div style={{ color: C.purple, fontSize: 38, fontWeight: 760 }}>{d.bplus.afterDeletionNodes}</div><div style={{ color: C.muted, fontSize: 16 }}>active nodes</div></div>
+              <div><div style={{ color: C.purple, fontSize: 38, fontWeight: 760 }}>{d.bplus.afterDeletionLevels}</div><div style={{ color: C.muted, fontSize: 16 }}>levels</div></div>
+            </div>
+            <Reveal at={825} distance={5} duration={12}><div style={{ marginTop: 16, borderRadius: 8, padding: '11px 14px', background: `${C.green}18`, border: `1px solid ${C.green}66`, color: C.green, fontSize: 19, fontWeight: 750, textAlign: 'center' }}>✓ STRUCTURAL VALIDATION PASSED</div></Reveal>
+          </Panel></Reveal>
+        </div>
+      </div>
+    </div>
+  </SceneFrame>;
+};
+
 // Keyed by edit point number (1-based), matching editPoints in data/timeline.ts.
 export const footageSlides: Record<number, React.FC> = {
   1: IntroFootageSlide,
@@ -346,4 +416,5 @@ export const footageSlides: Record<number, React.FC> = {
   4: Task2FootageSlide,
   5: RangeQueryFootageSlide,
   6: QueryEngineFootageSlide,
+  7: Task3ExecutionFootageSlide,
 };

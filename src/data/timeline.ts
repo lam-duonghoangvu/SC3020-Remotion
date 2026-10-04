@@ -18,8 +18,8 @@ export const scenes = [
   { id: 'Benchmark', title: 'Four-Way Benchmark', durationSeconds: 35, purpose: 'Compare runtime and application-level data-block read calls.' },
   { id: 'Selectivity', title: 'Selectivity Experiment', durationSeconds: 30, purpose: 'Compare observed retrieval times across query selectivities.' },
   { id: 'Deletion', title: 'Deletion', durationSeconds: 25, purpose: 'Separate logical index deletion from storage tombstoning.' },
-  { id: 'AfterDeletion', title: 'B+ Tree After Deletion', durationSeconds: 25, purpose: 'Show the resulting tree shape and validation outcome.' },
-  { id: 'Conclusion', title: 'Technical Takeaway', durationSeconds: 25, purpose: 'Summarize index search, RID grouping, locality, and selectivity.' },
+  { id: 'AfterDeletion', title: 'B+ Tree After Deletion', durationSeconds: 27, purpose: 'Show the resulting tree shape and validation outcome.' },
+  { id: 'Conclusion', title: 'Technical Takeaway', durationSeconds: 27, purpose: 'Summarize index search, RID grouping, locality, and selectivity.' },
 ] as const;
 
 export type SceneId = (typeof scenes)[number]['id'];
@@ -35,7 +35,7 @@ export const editPoints: readonly EditPoint[] = [
   { after: 'BPlusTree', insert: 'Run Task 2 in the terminal', slideSeconds: 27, marker: true },
   { after: 'QueryTraversal', insert: 'Show range_greater_than(), collect_range(), leftmost_leaf_for_key()', slideSeconds: 23, marker: false },
   { after: 'GroupedRetrieval', insert: 'Show QueryEngine naïve vs grouped implementation', slideSeconds: 25, marker: false },
-  { after: 'AfterDeletion', insert: 'Run real Task 3 deletion and show updated tree output', marker: true },
+  { after: 'AfterDeletion', insert: 'Animated Task 3 execution and validation', slideSeconds: 33, marker: false },
 ];
 
 // Voice-over clips in public/voice, keyed by scene id or RealFootageNN slide id.
@@ -58,6 +58,12 @@ export const voiceovers: Partial<Record<string, string>> = {
   RealFootage06: 'voice/15 - REAL FOOTAGE 06.m4a',
   Locality: 'voice/16 - Why Grouping Is Not Enough.m4a',
   HeapVsClustered: 'voice/17 - Heap vs FG-clustered Layout.m4a',
+  Benchmark: 'voice/18 - Four-Way Benchmark.m4a',
+  Selectivity: 'voice/19 - Selectivity Experiment.m4a',
+  Deletion: 'voice/20 - Task 3 Deletion.m4a',
+  AfterDeletion: 'voice/21 - B+ Tree After Deletion.m4a',
+  RealFootage07: 'voice/22 - REAL FOOTAGE 07 - Task 3 Execution.m4a',
+  Conclusion: 'voice/23 - Technical Takeaway.m4a',
 };
 
 export const footageSlideId = (number: number) => `RealFootage${String(number).padStart(2, '0')}`;

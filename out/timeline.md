@@ -1,6 +1,6 @@
 # Master Video Timeline
 
-Total runtime: 09:21 (561 seconds). Markers are included in the master and each lasts 1 second.
+Total runtime: 09:57 (597 seconds). Markers are included in the master and each lasts 1 second.
 
 | Scene | Start | End | Duration | Purpose | Suggested real footage after it |
 | --- | ---: | ---: | ---: | --- | --- |
@@ -26,6 +26,6 @@ Total runtime: 09:21 (561 seconds). Markers are included in the master and each 
 | Four-Way Benchmark | 07:00 | 07:35 | 00:35 | Compare runtime and application-level data-block read calls. | — |
 | Selectivity Experiment | 07:35 | 08:05 | 00:30 | Compare observed retrieval times across query selectivities. | — |
 | Deletion | 08:05 | 08:30 | 00:25 | Separate logical index deletion from storage tombstoning. | — |
-| B+ Tree After Deletion | 08:30 | 08:55 | 00:25 | Show the resulting tree shape and validation outcome. | Run real Task 3 deletion and show updated tree output |
-| EDIT POINT 07 | 08:55 | 08:56 | 00:01 | Post-production insertion slate | Run real Task 3 deletion and show updated tree output |
-| Technical Takeaway | 08:56 | 09:21 | 00:25 | Summarize index search, RID grouping, locality, and selectivity. | — |
+| B+ Tree After Deletion | 08:30 | 08:57 | 00:27 | Show the resulting tree shape and validation outcome. | Real Footage 07 slide |
+| REAL FOOTAGE 07 (slide) | 08:57 | 09:30 | 00:33 | Footage slide rendered in the master | — |
+| Technical Takeaway | 09:30 | 09:57 | 00:27 | Summarize index search, RID grouping, locality, and selectivity. | — |
