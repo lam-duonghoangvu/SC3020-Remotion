@@ -1,6 +1,7 @@
 import React from 'react';
 import { Composition, Sequence } from 'remotion';
 import { sceneComponents } from './scenes/Scenes';
+import { footageSlides } from './scenes/FootageSlides';
 import { EditMarker } from './components/Visuals';
 import { EDIT_MARKER_SECONDS, editPoints, FPS, HEIGHT, masterDurationSeconds, scenes, WIDTH } from './data/timeline';
 
@@ -15,9 +16,20 @@ export const MasterVideo: React.FC = () => {
       const editPoint = editPoints[editPointIndex];
       const section = <Sequence key={scene.id} from={start} durationInFrames={scene.durationSeconds * FPS} name={scene.title}><Component /></Sequence>;
       if (!editPoint) return section;
-      const marker = <Sequence key={`edit-${editPointIndex}`} from={cursor} durationInFrames={EDIT_MARKER_SECONDS * FPS} name={`Edit Point ${String(editPointIndex + 1).padStart(2, '0')}`}><EditMarker number={editPointIndex + 1} insert={editPoint.insert} /></Sequence>;
-      cursor += EDIT_MARKER_SECONDS * FPS;
-      return <React.Fragment key={`${scene.id}-with-edit`}>{section}{marker}</React.Fragment>;
+      const number = editPointIndex + 1;
+      const label = String(number).padStart(2, '0');
+      const Slide = footageSlides[number];
+      let slide: React.ReactNode = null;
+      if (editPoint.slideSeconds && Slide) {
+        slide = <Sequence from={cursor} durationInFrames={editPoint.slideSeconds * FPS} name={`Real Footage ${label}`}><Slide /></Sequence>;
+        cursor += editPoint.slideSeconds * FPS;
+      }
+      let marker: React.ReactNode = null;
+      if (editPoint.marker) {
+        marker = <Sequence from={cursor} durationInFrames={EDIT_MARKER_SECONDS * FPS} name={`Edit Point ${label}`}><EditMarker number={number} insert={editPoint.insert} /></Sequence>;
+        cursor += EDIT_MARKER_SECONDS * FPS;
+      }
+      return <React.Fragment key={`${scene.id}-with-edit`}>{section}{slide}{marker}</React.Fragment>;
     })}
   </>;
 };
@@ -27,6 +39,11 @@ export const RemotionRoot: React.FC = () => <>
   {scenes.map((scene) => {
     const Component = sceneComponents[scene.id];
     return <Composition key={scene.id} id={scene.id} component={Component} durationInFrames={scene.durationSeconds * FPS} fps={FPS} width={WIDTH} height={HEIGHT} />;
+  })}
+  {editPoints.map((point, index) => {
+    const Slide = footageSlides[index + 1];
+    if (!point.slideSeconds || !Slide) return null;
+    return <Composition key={`footage-${index + 1}`} id={`RealFootage${String(index + 1).padStart(2, '0')}`} component={Slide} durationInFrames={point.slideSeconds * FPS} fps={FPS} width={WIDTH} height={HEIGHT} />;
   })}
   {([
     { id: 'StorageLayout', sceneId: 'DataBlocks' },

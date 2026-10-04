@@ -1,0 +1,296 @@
+import React from 'react';
+import { interpolate, useCurrentFrame } from 'remotion';
+import { projectData as d } from '../data/projectData';
+import { Arrow, C, CodeFunctionLabel, MetricCard, Panel, Pill, Reveal, S, SceneFrame } from '../components/Visuals';
+
+// Code excerpts are taken from SC3020_Project1 (trimmed for on-screen reading).
+
+const KEYWORDS = new Set(['struct', 'class', 'const', 'return', 'if', 'while', 'for', 'true', 'false', 'static', 'constexpr', 'bool', 'void', 'float', 'auto', 'break', 'continue', 'private', 'public']);
+const TYPES = /^(u?int\d+_t|size_t|std|Record|RecordId|Block|BlockHeader|Node|Entry|BPlusEntry|BPlusNode|BPlusNodeType|StorageManager|BPlusTree|IOStats|NodeType)$/;
+
+const highlight = (line: string) => {
+  const commentAt = line.indexOf('//');
+  const code = commentAt >= 0 ? line.slice(0, commentAt) : line;
+  const comment = commentAt >= 0 ? line.slice(commentAt) : '';
+  const parts = code.split(/(\b[A-Za-z_][A-Za-z0-9_]*\b|\b\d+(?:\.\d+)?\b)/);
+  return <>
+    {parts.map((part, i) => {
+      if (KEYWORDS.has(part)) return <span key={i} style={{ color: C.purple }}>{part}</span>;
+      if (TYPES.test(part)) return <span key={i} style={{ color: C.blue }}>{part}</span>;
+      if (/^\d/.test(part)) return <span key={i} style={{ color: C.amber }}>{part}</span>;
+      if (/^[A-Za-z_]\w*$/.test(part) && parts[i + 1]?.startsWith('(')) return <span key={i} style={{ color: C.green }}>{part}</span>;
+      return <span key={i}>{part}</span>;
+    })}
+    {comment && <span style={{ color: C.dim }}>{comment}</span>}
+  </>;
+};
+
+const CodePanel = ({ file, code, at = 0, focus = [], fontSize = 18, style }: { file: string; code: string; at?: number; focus?: number[]; fontSize?: number; style?: React.CSSProperties }) => {
+  const frame = useCurrentFrame();
+  const glow = interpolate(frame, [at + 25, at + 45], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const lines = code.replace(/^\n|\n$/g, '').split('\n');
+  return <Reveal at={at} style={style}><div style={{ ...S.panel, padding: 0, overflow: 'hidden', height: '100%', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 18px', background: C.panel2, borderBottom: `1px solid ${C.line}` }}>
+      {[C.red, C.amber, C.green].map((color) => <span key={color} style={{ width: 11, height: 11, borderRadius: 99, background: `${color}aa` }} />)}
+      <span style={{ ...S.mono, color: C.muted, fontSize: 16, marginLeft: 10 }}>{file}</span>
+    </div>
+    <div style={{ ...S.mono, fontSize, lineHeight: 1.5, padding: '12px 0', whiteSpace: 'pre', color: C.text }}>
+      {lines.map((line, i) => {
+        const focused = focus.includes(i + 1);
+        return <div key={i} style={{ display: 'flex', background: focused ? `rgba(255,196,92,${0.1 * glow})` : undefined, borderLeft: `3px solid ${focused ? `rgba(255,196,92,${glow})` : 'transparent'}` }}>
+          <span style={{ width: 46, textAlign: 'right', paddingRight: 16, color: C.dim, flexShrink: 0 }}>{i + 1}</span>
+          <span>{highlight(line)}</span>
+        </div>;
+      })}
+    </div>
+  </div></Reveal>;
+};
+
+// ---------------------------------------------------------------- 01 · Human intro
+
+export const IntroFootageSlide = () => <SceneFrame section="Project 1 / Introduction" title="Hi, we are Group 19" accent={C.blue}>
+  <div style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 40 }}>
+    <Reveal at={10}><div style={{ color: C.muted, fontSize: 28, marginBottom: 46 }}>In this video, we will walk through:</div></Reveal>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr auto 1fr', alignItems: 'stretch', gap: 18 }}>
+      {[
+        { n: '01', title: 'Design', detail: 'Disk-based storage and the B+ tree index', color: C.blue, at: 60 },
+        { n: '02', title: 'Demonstration', detail: 'Tasks 1, 2 and 3 running on the NBA dataset', color: C.purple, at: 170 },
+        { n: '03', title: 'Analysis', detail: 'Query performance of the different retrieval strategies', color: C.amber, at: 300 },
+      ].map((step, i) => <React.Fragment key={step.n}>
+        <Reveal at={step.at}><Panel accent={step.color} style={{ height: '100%', boxSizing: 'border-box', padding: '34px 34px' }}>
+          <div style={{ ...S.mono, color: step.color, fontSize: 26, fontWeight: 700 }}>{step.n}</div>
+          <div style={{ fontSize: 40, fontWeight: 720, marginTop: 12 }}>{step.title}</div>
+          <div style={{ color: C.muted, fontSize: 23, lineHeight: 1.4, marginTop: 12 }}>{step.detail}</div>
+        </Panel></Reveal>
+        {i < 2 && <Reveal at={step.at + 50} style={{ display: 'flex' }}><Arrow color={C.dim} /></Reveal>}
+      </React.Fragment>)}
+    </div>
+    <Reveal at={420}><div style={{ display: 'flex', gap: 14, marginTop: 56 }}>
+      <Pill color={C.blue}>{d.records.valid.toLocaleString('en-US')} NBA GAME RECORDS</Pill>
+      <Pill color={C.purple}>B+ TREE ON FG_PCT_home</Pill>
+      <Pill color={C.amber}>STORE · QUERY · DELETE</Pill>
+    </div></Reveal>
+  </div>
+</SceneFrame>;
+
+// ---------------------------------------------------------------- 02 · Architecture / source tree
+
+const TREE: { path: string; depth: number; color?: string; note?: string; at: number }[] = [
+  { path: 'SC3020_Project1/', depth: 0, at: 0 },
+  { path: 'main.cpp', depth: 1, at: 6, note: 'Tasks 1–3' },
+  { path: 'src/', depth: 1, at: 10 },
+  { path: 'block.cpp', depth: 2, color: C.blue, at: 30, note: 'storage' },
+  { path: 'storage_manager.cpp', depth: 2, color: C.blue, at: 34, note: 'storage' },
+  { path: 'disk_manager.cpp', depth: 2, color: C.blue, at: 38, note: 'storage' },
+  { path: 'dataset_parser.cpp', depth: 2, color: C.blue, at: 42 },
+  { path: 'index/', depth: 2, color: C.purple, at: 90, note: 'insert · search · delete · validate' },
+  { path: 'query/', depth: 2, color: C.amber, at: 150, note: 'query_engine.cpp' },
+  { path: 'experiment/', depth: 2, color: C.green, at: 200, note: 'linear scan · runner · timer' },
+  { path: 'include/', depth: 1, at: 14, note: 'record.h · block.h · bplus_tree.h …' },
+  { path: 'tests/', depth: 1, at: 18 },
+];
+
+const ModuleBox = ({ title, detail, color, at }: { title: string; detail: string; color: string; at: number }) => <Reveal at={at}><div style={{ ...S.panel, borderTop: `3px solid ${color}`, padding: '20px 22px', textAlign: 'center' }}>
+  <div style={{ ...S.mono, color, fontSize: 25, fontWeight: 700 }}>{title}</div>
+  <div style={{ color: C.muted, fontSize: 18, marginTop: 6 }}>{detail}</div>
+</div></Reveal>;
+
+export const ArchitectureFootageSlide = () => <SceneFrame section="System Design / Source Tree" title="Storage, index, query and experiment modules" accent={C.blue}>
+  <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 40, height: '100%' }}>
+    <Panel title="Source tree" style={{ boxSizing: 'border-box' }}>
+      <div style={{ ...S.mono, fontSize: 21, lineHeight: 1.75 }}>
+        {TREE.map((item) => <Reveal key={item.path} at={item.at} distance={6} duration={12}><div style={{ display: 'flex', alignItems: 'baseline', gap: 14, paddingLeft: item.depth * 30 }}>
+          <span style={{ color: item.color ?? (item.path.endsWith('/') ? C.text : C.muted), fontWeight: item.color ? 700 : 500 }}>{item.depth > 0 ? '├ ' : ''}{item.path}</span>
+          {item.note && <span style={{ color: C.dim, fontSize: 16 }}>{item.note}</span>}
+        </div></Reveal>)}
+      </div>
+    </Panel>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 26 }}>
+      <ModuleBox title="QueryEngine" detail="connects the index to the data file" color={C.amber} at={150} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 26 }}>
+        <Reveal at={175}><div style={{ textAlign: 'center', color: C.purple, fontSize: 19 }}>① range_greater_than() ↙</div></Reveal>
+        <Reveal at={235}><div style={{ textAlign: 'center', color: C.blue, fontSize: 19 }}>↘ ② fetch by RecordId</div></Reveal>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 26 }}>
+        <ModuleBox title="BPlusTree" detail="(FG_PCT_home, RecordId) → index_disk.bin" color={C.purple} at={90} />
+        <ModuleBox title="StorageManager" detail="Record · Block → data_disk.bin" color={C.blue} at={30} />
+      </div>
+      <Reveal at={290}><Panel accent={C.red} style={{ padding: '18px 24px' }}>
+        <div style={{ fontSize: 23, lineHeight: 1.4 }}><span style={{ ...S.mono, color: C.blue }}>StorageManager</span> does not know about the B+ tree.<br /><span style={{ color: C.muted }}>Only the</span> <span style={{ ...S.mono, color: C.amber }}>RecordIds</span> <span style={{ color: C.muted }}>returned by the index link the two files.</span></div>
+      </Panel></Reveal>
+      <ModuleBox title="experiment/" detail="linear scan baseline · benchmark runner · timer" color={C.green} at={200} />
+    </div>
+  </div>
+</SceneFrame>;
+
+// ---------------------------------------------------------------- 03 · Task 1 implementation
+
+const RECORD_CODE = `
+#pragma pack(push, 1)
+struct Record {
+    uint32_t game_date_est; // YYYYMMDD
+    uint32_t team_id_home;
+    float fg_pct_home;      // B+ tree key
+    float ft_pct_home;
+    float fg3_pct_home;
+    uint16_t pts_home;
+    uint8_t ast_home;
+    uint8_t reb_home;
+    uint8_t home_team_wins;
+    bool is_deleted;        // tombstone
+};
+#pragma pack(pop)
+static_assert(sizeof(Record) == 26);`;
+
+const BLOCK_CODE = `
+// (4096 - 2) / 26 = 157 record slots
+MAX_RECORDS = (BLOCK_SIZE - HEADER_SIZE) / RECORD_SIZE;
+
+bool Block::insert_record(const Record& record, uint16_t& out_slot_id) {
+    uint16_t current_records = get_num_records();
+    if (current_records >= MAX_RECORDS) return false; // full
+    size_t offset = HEADER_SIZE + current_records * RECORD_SIZE;
+    std::memcpy(data.data() + offset, &record, RECORD_SIZE);
+    out_slot_id = current_records;
+    return true;
+}`;
+
+const STORAGE_CODE = `
+RecordId StorageManager::insert_record(const Record& record) {
+    uint16_t slot_id;
+    // Active block is full: flush it and start a new one
+    if (!current_block.insert_record(record, slot_id)) {
+        disk_manager.write_block(current_block_id, current_block);
+        current_block_id = disk_manager.allocate_block();
+        current_block = Block();
+        current_block.insert_record(record, slot_id);
+    }
+    return {current_block_id, slot_id};
+}`;
+
+export const Task1FootageSlide = () => <SceneFrame section="Task 1 / Implementation" title="Record → Block → StorageManager" accent={C.blue}>
+  <div style={{ display: 'grid', gridTemplateColumns: '0.72fr 1.28fr', gap: 26, height: '100%' }}>
+    <CodePanel file="include/record.h" code={RECORD_CODE} focus={[5, 12, 15]} fontSize={19} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <CodePanel file="src/block.cpp" code={BLOCK_CODE} at={110} focus={[2, 6]} fontSize={17} />
+      <CodePanel file="src/storage_manager.cpp" code={STORAGE_CODE} at={220} focus={[4, 5, 6, 10]} fontSize={17} />
+      <Reveal at={330}><div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
+        <Pill color={C.blue}>26 B RECORD</Pill><Arrow color={C.dim} /><Pill color={C.blue}>157 SLOTS / 4 KB BLOCK</Pill><Arrow color={C.dim} /><Pill color={C.amber}>RecordId (block_id, slot_id)</Pill>
+      </div></Reveal>
+    </div>
+  </div>
+</SceneFrame>;
+
+// ---------------------------------------------------------------- 04 · B+ tree code
+
+const NODE_CODE = `
+struct BPlusEntry {
+    float key;            // 4 B
+    RecordId record_id;   // 6 B
+};
+
+// | magic 4 | type 1 | reserved 1 | count 2 |
+// | parent 4 | previous 4 | next 4 | body  |
+struct BPlusNode {
+    static constexpr size_t HEADER_SIZE = 20;
+    BPlusNodeType type;
+    uint32_t parent, previous, next;
+    std::vector<BPlusEntry> entries; // leaf
+    std::vector<uint32_t> children;  // internal
+    std::vector<float> keys;         // internal
+};`;
+
+const INSERT_CODE = `
+bool BPlusTree::insert(float key, RecordId record_id) {
+    leaf.entries.insert(position, new_entry);
+    if (leaf.entries.size() <= order_) return true;
+
+    // Leaf overflow: move the upper half to a new right leaf
+    const size_t left_size = (leaf.entries.size() + 1) / 2;
+    right.entries.assign(begin + left_size, leaf.entries.end());
+    leaf.next = right.page_id;
+    insert_sibling_into_parent(leaf.page_id, right.page_id);
+}
+
+void BPlusTree::insert_sibling_into_parent(uint32_t left, uint32_t right) {
+    if (left.parent == INVALID_PAGE) { /* new root, ++height_ */ }
+    parent.children.insert(index + 1, right_page);
+    if (parent.children.size() > order_)
+        split_internal(parent.page_id); // propagates upward
+}`;
+
+export const Task2FootageSlide = () => <SceneFrame section="Task 2 / Implementation" title="Node layout and iterative insertion with splits" accent={C.purple}>
+  <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gap: 26, height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <CodePanel file="include/bplus_node.h" code={NODE_CODE} focus={[2, 3, 9]} fontSize={18} />
+      <Reveal at={150}><div style={{ ...S.mono, textAlign: 'center', fontSize: 23, fontWeight: 700 }}>⌊(4096 − 20) / 10⌋ = <span style={{ color: C.amber }}>n = {d.bplus.order}</span></div></Reveal>
+    </div>
+    <CodePanel file="src/index/bplus_insert.cpp" code={INSERT_CODE} at={60} focus={[6, 7, 9, 15, 16]} fontSize={18} />
+  </div>
+</SceneFrame>;
+
+// ---------------------------------------------------------------- 05 · Range query code
+
+const RANGE_CODE = `
+std::vector<Entry> BPlusTree::range_greater_than(
+        float key, IOStats& stats) const {
+    // FG_PCT_home > key  ->  (key, +inf]
+    return collect_range(key, +infinity, false, true);
+}`;
+
+const LEFTMOST_CODE = `
+Node BPlusTree::leftmost_leaf_for_key(float key) const {
+    Node leaf = descend_to_leaf(key);
+    // Equal keys may span several leaves: walk left
+    while (leaf.previous != INVALID_PAGE) {
+        Node previous = read_node(leaf.previous);
+        if (previous.entries.empty() ||
+            previous.entries.back().key < key) break;
+        leaf = std::move(previous);
+    }
+    return leaf;
+}`;
+
+const COLLECT_CODE = `
+std::vector<Entry> BPlusTree::collect_range(
+        float lower, float upper,
+        bool incl_lower, bool incl_upper) const {
+    Node leaf = leftmost_leaf_for_key(lower);
+    while (true) {
+        for (const Entry& entry : leaf.entries) {
+            if (below_lower) continue;   // skip key <= 0.5
+            if (above_upper) return result;
+            result.push_back(entry);     // (key, RecordId)
+        }
+        if (leaf.next == INVALID_PAGE) break;
+        leaf = read_node(leaf.next); // follow leaf chain
+    }
+    return result;
+}`;
+
+export const RangeQueryFootageSlide = () => <SceneFrame section="Task 3 / Range Query Code" title="Three functions answer FG_PCT_home > 0.5" accent={C.amber}>
+  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 26, height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <CodePanel file="src/index/bplus_search.cpp" code={RANGE_CODE} focus={[4]} fontSize={18} />
+      <CodePanel file="src/index/bplus_search.cpp" code={LEFTMOST_CODE} at={200} focus={[4, 5, 6, 7, 8]} fontSize={18} />
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <CodePanel file="src/index/bplus_search.cpp" code={COLLECT_CODE} at={400} focus={[4, 9, 12]} fontSize={18} />
+      <Reveal at={560}><div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
+        <CodeFunctionLabel color={C.amber}>range</CodeFunctionLabel><Arrow color={C.dim} />
+        <CodeFunctionLabel color={C.purple}>leftmost leaf</CodeFunctionLabel><Arrow color={C.dim} />
+        <CodeFunctionLabel color={C.green}>leaf chain</CodeFunctionLabel>
+      </div></Reveal>
+      <Reveal at={620}><MetricCard label="Matching entries" value={d.task3.matches.toLocaleString('en-US')} note={`${d.task3.selectivityPct}% of the dataset`} accent={C.amber} /></Reveal>
+    </div>
+  </div>
+</SceneFrame>;
+
+// Keyed by edit point number (1-based), matching editPoints in data/timeline.ts.
+export const footageSlides: Record<number, React.FC> = {
+  1: IntroFootageSlide,
+  2: ArchitectureFootageSlide,
+  3: Task1FootageSlide,
+  4: Task2FootageSlide,
+  5: RangeQueryFootageSlide,
+};

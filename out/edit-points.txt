@@ -1,9 +1,6 @@
 timestamp | scene before | recommended inserted footage | scene after
 --- | --- | --- | ---
-00:08 | Project Title | Human project introduction | Architecture Overview
-00:34 | Architecture Overview | Explain project architecture / show source directory | Record Layout
-01:20 | 4 KB Data Blocks | Show Task 1 implementation + run Task 1 | B+ Tree Page Design
-01:51 | B+ Tree Page Design | Show B+ tree node structures, insert/split code, run Task 2 | Duplicate-Key Handling
-02:42 | Range-Query Traversal | Show range_greater_than(), collect_range(), leftmost_leaf_for_key() | Naïve RID Retrieval
-03:28 | Grouped RID Retrieval | Show QueryEngine naïve vs grouped implementation | Why Grouping Is Not Enough
-06:14 | B+ Tree After Deletion | Run real Task 3 deletion and show updated tree output | Technical Takeaway
+02:13 | Real Footage 03 slide | Run Task 1 in the terminal | B+ Tree Page Design
+02:54 | Real Footage 04 slide | Run Task 2 in the terminal | Duplicate-Key Handling
+04:55 | Grouped RID Retrieval | Show QueryEngine naïve vs grouped implementation | Why Grouping Is Not Enough
+07:41 | B+ Tree After Deletion | Run real Task 3 deletion and show updated tree output | Technical Takeaway

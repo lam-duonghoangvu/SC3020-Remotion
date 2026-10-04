@@ -24,21 +24,29 @@ export const scenes = [
 
 export type SceneId = (typeof scenes)[number]['id'];
 
-export const editPoints = [
-  { after: 'ProjectTitle', insert: 'Human project introduction' },
-  { after: 'Architecture', insert: 'Explain project architecture / show source directory' },
-  { after: 'DataBlocks', insert: 'Show Task 1 implementation + run Task 1' },
-  { after: 'BPlusTree', insert: 'Show B+ tree node structures, insert/split code, run Task 2' },
-  { after: 'QueryTraversal', insert: 'Show range_greater_than(), collect_range(), leftmost_leaf_for_key()' },
-  { after: 'GroupedRetrieval', insert: 'Show QueryEngine naïve vs grouped implementation' },
-  { after: 'AfterDeletion', insert: 'Run real Task 3 deletion and show updated tree output' },
-] as const;
+// slideSeconds: a REAL FOOTAGE slide rendered at this edit point.
+// marker: a 1-second insertion slate (after the slide, if any) for footage recorded separately.
+export type EditPoint = { after: SceneId; insert: string; slideSeconds?: number; marker: boolean };
+
+export const editPoints: readonly EditPoint[] = [
+  { after: 'ProjectTitle', insert: 'Human project introduction', slideSeconds: 20, marker: false },
+  { after: 'Architecture', insert: 'Explain project architecture / show source directory', slideSeconds: 20, marker: false },
+  { after: 'DataBlocks', insert: 'Run Task 1 in the terminal', slideSeconds: 15, marker: true },
+  { after: 'BPlusTree', insert: 'Run Task 2 in the terminal', slideSeconds: 10, marker: true },
+  { after: 'QueryTraversal', insert: 'Show range_greater_than(), collect_range(), leftmost_leaf_for_key()', slideSeconds: 25, marker: false },
+  { after: 'GroupedRetrieval', insert: 'Show QueryEngine naïve vs grouped implementation', marker: true },
+  { after: 'AfterDeletion', insert: 'Run real Task 3 deletion and show updated tree output', marker: true },
+];
+
+export const editPointSeconds = (point: EditPoint) => (point.slideSeconds ?? 0) + (point.marker ? EDIT_MARKER_SECONDS : 0);
+
+const editSecondsAfter = (sceneId: SceneId) => {
+  const point = editPoints.find((candidate) => candidate.after === sceneId);
+  return point ? editPointSeconds(point) : 0;
+};
 
 export const sceneStartSeconds = (index: number) => scenes
   .slice(0, index)
-  .reduce((seconds, scene) => seconds + scene.durationSeconds + (editPoints.some((point) => point.after === scene.id) ? EDIT_MARKER_SECONDS : 0), 0);
+  .reduce((seconds, scene) => seconds + scene.durationSeconds + editSecondsAfter(scene.id), 0);
 
-export const masterDurationSeconds = scenes.reduce(
-  (seconds, scene) => seconds + scene.durationSeconds + (editPoints.some((point) => point.after === scene.id) ? EDIT_MARKER_SECONDS : 0),
-  0,
-);
+export const masterDurationSeconds = scenes.reduce((seconds, scene) => seconds + scene.durationSeconds + editSecondsAfter(scene.id), 0);
