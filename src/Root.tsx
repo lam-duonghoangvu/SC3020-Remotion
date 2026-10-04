@@ -4,7 +4,7 @@ import { sceneComponents } from './scenes/Scenes';
 import { footageSlides } from './scenes/FootageSlides';
 import { EditMarker } from './components/Visuals';
 import { subtitleCues } from './data/subtitles';
-import { EDIT_MARKER_SECONDS, editPoints, footageSlideId, FPS, HEIGHT, masterDurationSeconds, scenes, voiceovers, WIDTH } from './data/timeline';
+import { EDIT_MARKER_SECONDS, editPoints, footageSlideId, FPS, HEIGHT, masterDurationSeconds, scenes, THANK_YOU_SECONDS, voiceovers, WIDTH } from './data/timeline';
 
 // Renders a segment with its voice-over clip, if one is mapped to this id.
 const Voiced = ({ id, component: Component }: { id: string; component: React.FC }) => {
@@ -20,6 +20,14 @@ const Subtitles: React.FC = () => {
     <div style={{ maxWidth: 1540, padding: '12px 25px 14px', borderRadius: 12, background: 'rgba(3, 7, 12, 0.88)', border: '1px solid rgba(255,255,255,.16)', boxShadow: '0 8px 28px rgba(0,0,0,.42)', color: '#fff', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', fontSize: 36, fontWeight: 620, lineHeight: 1.24, textAlign: 'center', textShadow: '0 2px 4px rgba(0,0,0,.9)' }}>{cue.text}</div>
   </div>;
 };
+
+const ThankYouSlide: React.FC = () => <div style={{ width: WIDTH, height: HEIGHT, display: 'grid', placeItems: 'center', position: 'relative', overflow: 'hidden', color: '#eff4fb', background: 'radial-gradient(ellipse at 50% 42%, rgba(91,214,164,.16), transparent 38%), #0b1018', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
+  <div style={{ position: 'absolute', inset: 0, opacity: .13, backgroundImage: 'linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
+  <div style={{ position: 'relative', textAlign: 'center' }}>
+    <div style={{ color: '#5bd6a4', fontSize: 22, fontWeight: 750, letterSpacing: 5, marginBottom: 24 }}>GROUP 19 · SC3020 PROJECT 1</div>
+    <div style={{ fontSize: 92, lineHeight: 1, fontWeight: 760, letterSpacing: -4 }}>Thank you</div>
+  </div>
+</div>;
 
 export const MasterVideo: React.FC = () => {
   let cursor = 0;
@@ -47,6 +55,7 @@ export const MasterVideo: React.FC = () => {
       }
       return <React.Fragment key={`${scene.id}-with-edit`}>{section}{slide}{marker}</React.Fragment>;
     })}
+    <Sequence from={(masterDurationSeconds - THANK_YOU_SECONDS) * FPS} durationInFrames={THANK_YOU_SECONDS * FPS} name="Thank You"><ThankYouSlide /></Sequence>
     <Subtitles />
   </div>;
 };

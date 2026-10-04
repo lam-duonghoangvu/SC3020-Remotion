@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { subtitleCues } from '../src/data/subtitles';
-import { editPoints, EDIT_MARKER_SECONDS, masterDurationSeconds, scenes, type EditPoint } from '../src/data/timeline';
+import { editPoints, EDIT_MARKER_SECONDS, masterDurationSeconds, scenes, THANK_YOU_SECONDS, type EditPoint } from '../src/data/timeline';
 
 const time = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
 const editByScene = new Map<string, EditPoint & { number: number }>(editPoints.map((point, index) => [point.after, { ...point, number: index + 1 }] as const));
@@ -33,6 +33,8 @@ for (let index = 0; index < scenes.length; index += 1) {
     cursor += EDIT_MARKER_SECONDS;
   }
 }
+
+timelineRows.push(`| Thank You | ${time(cursor)} | ${time(cursor + THANK_YOU_SECONDS)} | ${time(THANK_YOU_SECONDS)} | Close the presentation. | — |`);
 
 await mkdir('out', { recursive: true });
 await writeFile('out/timeline.md', `${timelineRows.join('\n')}\n`, 'utf8');

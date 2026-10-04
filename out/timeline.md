@@ -1,6 +1,6 @@
 # Master Video Timeline
 
-Total runtime: 09:57 (597 seconds). Markers are included in the master and each lasts 1 second.
+Total runtime: 09:58 (598 seconds). Markers are included in the master and each lasts 1 second.
 
 | Scene | Start | End | Duration | Purpose | Suggested real footage after it |
 | --- | ---: | ---: | ---: | --- | --- |
@@ -29,3 +29,4 @@ Total runtime: 09:57 (597 seconds). Markers are included in the master and each 
 | B+ Tree After Deletion | 08:30 | 08:57 | 00:27 | Show the resulting tree shape and validation outcome. | Real Footage 07 slide |
 | REAL FOOTAGE 07 (slide) | 08:57 | 09:30 | 00:33 | Footage slide rendered in the master | — |
 | Technical Takeaway | 09:30 | 09:57 | 00:27 | Summarize index search, RID grouping, locality, and selectivity. | — |
+| Thank You | 09:57 | 09:58 | 00:01 | Close the presentation. | — |

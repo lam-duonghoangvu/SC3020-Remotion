@@ -2,6 +2,7 @@ export const FPS = 30;
 export const WIDTH = 1920;
 export const HEIGHT = 1080;
 export const EDIT_MARKER_SECONDS = 1;
+export const THANK_YOU_SECONDS = 1;
 
 export const scenes = [
   { id: 'ProjectTitle', title: 'Project Title', durationSeconds: 12, purpose: 'Introduce the project and its storage, index, and retrieval themes.' },
@@ -79,4 +80,4 @@ export const sceneStartSeconds = (index: number) => scenes
   .slice(0, index)
   .reduce((seconds, scene) => seconds + scene.durationSeconds + editSecondsAfter(scene.id), 0);
 
-export const masterDurationSeconds = scenes.reduce((seconds, scene) => seconds + scene.durationSeconds + editSecondsAfter(scene.id), 0);
+export const masterDurationSeconds = scenes.reduce((seconds, scene) => seconds + scene.durationSeconds + editSecondsAfter(scene.id), 0) + THANK_YOU_SECONDS;
